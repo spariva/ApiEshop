@@ -1,6 +1,15 @@
+using ApiEshop.Data;
+using ApiEshop.Repositories;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services.
+string connectionString = builder.Configuration.GetConnectionString("SqlAzure");
+builder.Services.AddDbContext<EshopContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddTransient<RepositoryStores>();
+builder.Services.AddTransient<RepositoryUsers>();
+builder.Services.AddTransient<RepositoryPayments>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
