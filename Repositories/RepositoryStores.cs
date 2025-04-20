@@ -30,7 +30,7 @@ namespace ApiEshop.Repositories
             return store;
         }
 
-        public async Task<StoreViewDto> FindStoreAsync(int idStore) {
+        public async Task<StoreView> FindStoreAsync(int idStore) {
             var consulta = from datos in this.context.Stores
                            where datos.Id == idStore
                            select datos;
@@ -51,51 +51,14 @@ namespace ApiEshop.Repositories
                 .ToList();
 
             // Create the StoreView
-            //StoreView storeView = new StoreView()
-            //{
-            //    Store = store,
-            //    Products = products,
-            //    ProdCategories = categoryNames
-            //};
-
-            //return storeView;
-
-            StoreDto storeDto = new StoreDto()
+            StoreView storeView = new StoreView()
             {
-                Id = store.Id,
-                Name = store.Name,
-                Email = store.Email,
-                Image = store.Image,
-                Category = store.Category,
-                UserId = store.UserId,
-                StripeId = store.StripeId
+                Store = store,
+                Products = products,
+                ProdCategories = categoryNames
             };
 
-            List<ProductDto> productDtos = products.Select(p => new ProductDto
-            {
-                Id = p.Id,
-                StoreId = p.StoreId,
-                Name = p.Name,
-                Description = p.Description,
-                Image = p.Image,
-                Price = p.Price,
-                StockQuantity = p.StockQuantity,
-                Categories = p.ProdCats.Select(pc => new CategoryDto
-                {
-                    Id = pc.Category.Id,
-                    CategoryName = pc.Category.CategoryName
-                }).ToList()
-            }).ToList();
-
-            // Create the StoreViewDto
-            StoreViewDto storeViewDto = new StoreViewDto()
-            {
-                Store = storeDto,
-                Products = productDtos,
-                ProductCategories = categoryNames
-            };
-
-            return storeViewDto;
+            return storeView;
         }
 
 
