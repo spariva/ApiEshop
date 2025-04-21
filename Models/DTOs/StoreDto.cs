@@ -8,6 +8,6 @@
         public string Image { get; set; }
         public string Category { get; set; }
         public int UserId { get; set; }
-        public string StripeId { get; set; }
+        
     }
 }

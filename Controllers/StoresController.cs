@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Stripe;
+using AutoMapper;
 
 namespace ApiEshop.Controllers
 {
@@ -14,12 +15,14 @@ namespace ApiEshop.Controllers
     {
         private RepositoryStores repoStores;
         private RepositoryUsers repoUsers;
+        private readonly IMapper mapper;
         //private HelperPathProvider helperPath;
 
-        public StoresController(RepositoryStores repoStores, RepositoryUsers repoUsers)
+        public StoresController(RepositoryStores repoStores, RepositoryUsers repoUsers, IMapper mapper)
         {
             this.repoStores = repoStores;
             this.repoUsers = repoUsers;
+            this.mapper = mapper;
         }
 
         #region Stores CRUD
@@ -27,7 +30,8 @@ namespace ApiEshop.Controllers
         public async Task<IActionResult> GetStores()
         {
             List<Store> stores = await this.repoStores.GetStoresAsync();
-            return Ok(stores);
+            List<StoreDto> storesDto = this.mapper.Map<List<StoreDto>>(stores);
+            return Ok(storesDto);
         }
 
         [HttpGet("{id}")]
@@ -39,38 +43,10 @@ namespace ApiEshop.Controllers
                 return NotFound();
             }
 
-            StoreDto storeDto = new StoreDto()
+            StoreViewDto storeViewDto = new StoreViewDto
             {
-                Id = store.Store.Id,
-                Name = store.Store.Name,
-                Email = store.Store.Email,
-                Image = store.Store.Image,
-                Category = store.Store.Category,
-                UserId = store.Store.UserId,
-                StripeId = store.Store.StripeId
-            };
-
-            List<ProductDto> productDtos = store.Products.Select(p => new ProductDto
-            {
-                Id = p.Id,
-                StoreId = p.StoreId,
-                Name = p.Name,
-                Description = p.Description,
-                Image = p.Image,
-                Price = p.Price,
-                StockQuantity = p.StockQuantity,
-                Categories = p.ProdCats.Select(pc => new CategoryDto
-                {
-                    Id = pc.Category.Id,
-                    CategoryName = pc.Category.CategoryName
-                }).ToList()
-            }).ToList();
-
-            // Create the StoreViewDto
-            StoreViewDto storeViewDto = new StoreViewDto()
-            {
-                Store = storeDto,
-                Products = productDtos,
+                Store = this.mapper.Map<StoreDto>(store.Store),
+                Products = this.mapper.Map<List<ProductDto>>(store.Products),
                 ProductCategories = store.ProdCategories
             };
 
@@ -81,87 +57,80 @@ namespace ApiEshop.Controllers
         [Route("SimpleStore/{id}")]
         public async Task<IActionResult> GetSimpleStore(int id)
         {
-            StoreView store = await this.repoStores.FindStoreAsync(id);
+            Store store = await this.repoStores.FindSimpleStoreAsync(id);
             if (store == null)
             {
                 return NotFound();
             }
 
-            StoreDto storeDto = new StoreDto()
-            {
-                Id = store.Store.Id,
-                Name = store.Store.Name,
-                Email = store.Store.Email,
-                Image = store.Store.Image,
-                Category = store.Store.Category,
-                UserId = store.Store.UserId,
-                StripeId = store.Store.StripeId
-            };
+            StoreDto storeDto = this.mapper.Map<StoreDto>(store);
 
             return Ok(storeDto);
         }
 
-        ////Store create
-        //[HttpPost]
-        //[Route("Create")]
-        //public async Task<IActionResult> CreateStore([FromBody] StoreDto storeDto)
-        //{
-        //    if (storeDto == null)
-        //    {
-        //        return BadRequest();
-        //    }
+        //Store create
+        [HttpPost]
+        [Route("Create")]
+        public async Task<IActionResult> CreateStore([FromBody] StoreDto storeDto)
+        {
+            if (storeDto == null)
+            {
+                return BadRequest();
+            }
 
-        //    await this.repoStores.CreateStoreAsync(store);
-        //    return CreatedAtAction(nameof(GetStore), new { id = store.Id }, store);
-        //}
+            await this.repoStores.CreateStoreAsync(store);
+            return CreatedAtAction(nameof(GetStore), new { id = store.Id }, store);
+        }
 
 
-        //[HttpGet("Stores/OnboardingComplete/{id}")]
-        //public async Task<IActionResult> OnboardingComplete(int id)
-        //{
-        //    var store = await this.repoStores.FindSimpleStoreAsync(id);
-        //    if (store == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpGet]
+        [Route("OnboardingComplete/{id}")]
+        public async Task<IActionResult> OnboardingComplete(int id)
+        {
+            var store = await this.repoStores.FindSimpleStoreAsync(id);
+            if (store == null)
+            {
+                return NotFound();
+            }
 
-        //    // Verify this user owns the store
-        //    if (store.UserId != int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
-        //    {
-        //        return Forbid();
-        //    }
+            // Verify this user owns the store
+            if (store.UserId != int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            {
+                return Forbid();
+            }
 
-        //    // Show success page or redirect to store dashboard
-        //    return RedirectToAction("StoreDetails", new { id = store.Id });
-        //}
+            // Show success page or redirect to store dashboard
+            return RedirectToAction("StoreDetails", new { id = store.Id });
+        }
 
-        //[HttpGet("Stores/RefreshOnboarding/{id}")]
-        //public async Task<IActionResult> RefreshOnboarding(int id)
-        //{
-        //    Store store = await this.repoStores.FindSimpleStoreAsync(id);
-        //    if (store == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpGet]
+        [Route("Stores/RefreshOnboarding/{id}")]
+        public async Task<IActionResult> RefreshOnboarding(int id)
+        {
+            Store store = await this.repoStores.FindSimpleStoreAsync(id);
+            if (store == null)
+            {
+                return NotFound();
+            }
 
-        //    // Verify this user owns the store
-        //    if (store.UserId != int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
-        //    {
-        //        return Forbid();
-        //    }
+            // Verify this user owns the store
+            if (store.UserId != int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            {
+                return Forbid();
+            }
 
-        //    // Create a new account link
-        //    var accountLinkService = new AccountLinkService();
-        //    var accountLink = accountLinkService.Create(new AccountLinkCreateOptions
-        //    {
-        //        Account = store.StripeId,
-        //        ReturnUrl = Url.Action("OnboardingComplete", "Stores", new { id = store.Id }, Request.Scheme),
-        //        RefreshUrl = Url.Action("RefreshOnboarding", "Stores", new { id = store.Id }, Request.Scheme),
-        //        Type = "account_onboarding",
-        //    });
+            // Create a new account link
+            var accountLinkService = new AccountLinkService();
+            var accountLink = accountLinkService.Create(new AccountLinkCreateOptions
+            {
+                Account = store.StripeId,
+                ReturnUrl = Url.Action("OnboardingComplete", "Stores", new { id = store.Id }, Request.Scheme),
+                RefreshUrl = Url.Action("RefreshOnboarding", "Stores", new { id = store.Id }, Request.Scheme),
+                Type = "account_onboarding",
+            });
 
-        //    return Redirect(accountLink.Url);
-        //}
+            return Redirect(accountLink.Url);
+        }
 
 
 

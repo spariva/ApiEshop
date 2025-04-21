@@ -1,5 +1,7 @@
 using ApiEshop.Data;
+using ApiEshop.Mappings;
 using ApiEshop.Repositories;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,11 @@ builder.Services.AddDbContext<EshopContext>(options => options.UseSqlServer(conn
 builder.Services.AddTransient<RepositoryStores>();
 builder.Services.AddTransient<RepositoryUsers>();
 builder.Services.AddTransient<RepositoryPayments>();
+
+//builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(typeof(MapperProfile));
+//Mapper.Initialize(cfg => cfg.AddProfile<MappingProfile>());
+//builder.Services.AddAutoMapper();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

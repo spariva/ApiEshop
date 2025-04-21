@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Stripe;
 using System.Security.Claims;
+using AutoMapper;
 
 
 namespace ApiEshop.Controllers
@@ -17,12 +18,14 @@ namespace ApiEshop.Controllers
     {
         private RepositoryStores repoStores;
         private RepositoryUsers repoUsers;
+        private readonly IMapper mapper;
         //private HelperPathProvider helperPath;
 
-        public ProductsController(RepositoryStores repoStores, RepositoryUsers repoUsers)
+        public ProductsController(RepositoryStores repoStores, RepositoryUsers repoUsers, IMapper mapper)
         {
             this.repoStores = repoStores;
             this.repoUsers = repoUsers;
+            this.mapper = mapper;
             //this.helperPath = helperPath;
         }
 

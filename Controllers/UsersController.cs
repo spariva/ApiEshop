@@ -4,6 +4,7 @@ using ApiEshop.Models;
 using ApiEshop.Models.DTOs;
 using Product = ApiEshop.Models.Product;
 using ApiEshop.Repositories;
+using AutoMapper;
 
 namespace ApiEshop.Controllers
 {
@@ -14,12 +15,15 @@ namespace ApiEshop.Controllers
         private RepositoryStores repoStores;
         private RepositoryUsers repoUsers;
         private RepositoryPayments repoPay;
+        private readonly IMapper mapper;
 
-        public UsersController(RepositoryStores repoStores, RepositoryUsers repoUsers, RepositoryPayments repoPay)
+
+        public UsersController(RepositoryStores repoStores, RepositoryUsers repoUsers, RepositoryPayments repoPay, IMapper mapper)
         {
             this.repoStores = repoStores;
             this.repoUsers = repoUsers;
             this.repoPay = repoPay;
+            this.mapper = mapper;
         }
 
         //Podría hacer que el dto use el dto user etc y empezar a ocultar info
@@ -55,49 +59,49 @@ namespace ApiEshop.Controllers
             return Ok(profileDto);
         }
 
-        [HttpGet]
-        [Route("[action]/{id}")]
-        public async Task<IActionResult> PurchaseDetails(int id)
-        {
-            Purchase purchase = await this.repoPay.GetPurchaseByIdAsync(id);
-            if (purchase == null)
-            {
-                return NotFound("Purchase not found =(");
-            }
+        //[HttpGet]
+        //[Route("[action]/{id}")]
+        //public async Task<IActionResult> PurchaseDetails(int id)
+        //{
+        //    Purchase purchase = await this.repoPay.GetPurchaseByIdAsync(id);
+        //    if (purchase == null)
+        //    {
+        //        return NotFound("Purchase not found =(");
+        //    }
 
-            foreach (PurchaseItem item in purchase.PurchaseItems)
-            {
-                item.Product = await this.repoStores.FindProductAsync(item.ProductId);
-            }
+        //    foreach (PurchaseItem item in purchase.PurchaseItems)
+        //    {
+        //        item.Product = await this.repoStores.FindProductAsync(item.ProductId);
+        //    }
 
-            PurchaseDto purchaseDto = new PurchaseDto
-            {
-                Id = purchase.Id,
-                UserId = purchase.UserId,
-                TotalPrice = purchase.TotalPrice,
-                PaymentStatus = purchase.PaymentStatus,
-                CreatedAt = purchase.CreatedAt,
-                Items = purchase.PurchaseItems.Select(item => new PurchaseItemDto
-                {
-                    Id = item.Id,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    Price = item.PriceAtPurchase,
-                    Product = new ProductDto
-                    {
-                        Id = item.Product.Id,
-                        Name = item.Product.Name,
-                        Description = item.Product.Description,
-                        Price = item.Product.Price,
-                        StockQuantity = item.Product.StockQuantity,
-                        ImageUrl = item.Product.ImageUrl
-                    }
-                }).ToList()
+        //    PurchaseDto purchaseDto = new PurchaseDto
+        //    {
+        //        Id = purchase.Id,
+        //        UserId = purchase.UserId,
+        //        TotalPrice = purchase.TotalPrice,
+        //        PaymentStatus = purchase.PaymentStatus,
+        //        CreatedAt = purchase.CreatedAt,
+        //        Items = purchase.PurchaseItems.Select(item => new PurchaseItemDto
+        //        {
+        //            Id = item.Id,
+        //            ProductId = item.ProductId,
+        //            Quantity = item.Quantity,
+        //            Price = item.PriceAtPurchase,
+        //            Product = new ProductDto
+        //            {
+        //                Id = item.Product.Id,
+        //                Name = item.Product.Name,
+        //                Description = item.Product.Description,
+        //                Price = item.Product.Price,
+        //                StockQuantity = item.Product.StockQuantity,
+        //                ImageUrl = item.Product.ImageUrl
+        //            }
+        //        }).ToList()
 
-            };
-            // AAAA haz el automapper ya, y estos dtos están mal, pone en purchaseitemdto solo el name de product
-            return Ok(purchase);
-        }
+        //    };
+        //    // AAAA haz el automapper ya, y estos dtos están mal, pone en purchaseitemdto solo el name de product
+        //    return Ok(purchase);
+        //}
 
 
 
