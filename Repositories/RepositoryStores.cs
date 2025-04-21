@@ -84,6 +84,11 @@ namespace ApiEshop.Repositories
         public async Task<Store> UpdateStoreAsync(int id, string name, string email, string image, string category) {
             Store s = await this.FindSimpleStoreAsync(id);
 
+            if(s == null)
+            {
+                return null;
+            }
+
             s.Name = name;
             s.Email = email;
             s.Image = image;

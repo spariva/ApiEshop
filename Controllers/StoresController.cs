@@ -68,18 +68,13 @@ namespace ApiEshop.Controllers
             return Ok(storeDto);
         }
 
-        //Store create
+        //Store create, stripe etc handled on mvc so I send a model instead a dto
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> CreateStore([FromBody] StoreDto storeDto)
+        public async Task<IActionResult> CreateStore(Store store)
         {
-            if (storeDto == null)
-            {
-                return BadRequest();
-            }
-
-            await this.repoStores.CreateStoreAsync(store);
-            return CreatedAtAction(nameof(GetStore), new { id = store.Id }, store);
+            Store s = await this.repoStores.CreateStoreAsync(store.Name, store.Email, store.Image, store.Category, store.UserId, store.StripeId);
+            return Ok(s);
         }
 
 
@@ -130,6 +125,25 @@ namespace ApiEshop.Controllers
             });
 
             return Redirect(accountLink.Url);
+        }
+
+        [HttpPut]
+        [Route("Update/{id}")]
+        public async Task<IActionResult> UpdateStore(int id, StoreDto s)
+        {
+
+            var result = await this.repoStores.UpdateStoreAsync(id, s.Name, s.Email, s.FileName, s.Category);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            Store store = this.mapper.Map<Store>(s);
+
+            bool result = await this.repoStores.UpdateStoreAsync(store);
+
+            return NoContent();
         }
 
 
