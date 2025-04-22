@@ -132,18 +132,25 @@ namespace ApiEshop.Controllers
         public async Task<IActionResult> UpdateStore(int id, StoreDto s)
         {
 
-            var result = await this.repoStores.UpdateStoreAsync(id, s.Name, s.Email, s.FileName, s.Category);
+            var result = await this.repoStores.UpdateStoreAsync(id, s.Name, s.Email, s.Image, s.Category);
 
             if (result == null)
             {
                 return NotFound();
             }
 
-            Store store = this.mapper.Map<Store>(s);
+            StoreDto store = this.mapper.Map<StoreDto>(s);
 
-            bool result = await this.repoStores.UpdateStoreAsync(store);
+            return Ok(store);
+        }
 
-            return NoContent();
+        [HttpDelete]
+        [Route("delete/{id}")]
+        public async Task<IActionResult> DeleteStore(int id)
+        {
+            await this.repoStores.DeleteStoreAsync(id);
+
+            return Ok();
         }
 
 

@@ -35,17 +35,35 @@ namespace ApiEshop.Controllers
         public async Task<IActionResult> ProductList()
         {
             List<Product> products = await this.repoStores.GetAllProductsAsync();
-            return Ok(products);
+            List<ProductDto> productsDto = this.mapper.Map<List<ProductDto>>(products);
+            return Ok(productsDto);
         }
 
-        //public async Task<IActionResult> ProductDetails(int id)
-        //{
-        //    Product product = await this.repoStores.FindProductAsync(id);
-        //    Store store = await this.repoStores.FindSimpleStoreAsync(product.StoreId);
-        //    ViewBag.Store = store;
+        [HttpGet]
+        [Route("Details/{id}")]
+        public async Task<IActionResult> ProductDetails(int id)
+        {
+            Product product = await this.repoStores.FindProductAsync(id);
+            ProductDto p = this.mapper.Map<ProductDto>(product);
+            return Ok(p);
+        }
 
-        //    return View(product);
-        //}
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Categories()
+        {
+            List<Category> categories = await this.repoStores.GetAllCategoriesAsync();
+            List<CategoryDto> c = this.mapper.Map<List<CategoryDto>>(categories);
+            return Ok(categories);  
+        }
+
+        [HttpPost]
+        [Route("[action]/{id}")
+        public async Task<IActionResult> Create(ProductDto p)
+        {
+            Product product = await this.repoStores.CreateProductAsync(p.Name, p.StoreId, p.Description, p.Image, p.Price, p.StockQuantity, p.Categories);
+
+        }
 
         //[AuthorizeUser]
         //public async Task<IActionResult> ProductCreate()

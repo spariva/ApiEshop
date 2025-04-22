@@ -9,6 +9,7 @@ namespace ApiEshop.Mappings
         public MapperProfile()
         {
             CreateMap<Store, StoreDto>();
+            CreateMap<StoreDto, Store>();
 
             CreateMap<Category, CategoryDto>();
 
