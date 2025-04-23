@@ -27,7 +27,7 @@ namespace ApiEshop.Controllers
 
         #region Stores CRUD
         [HttpGet]
-        public async Task<IActionResult> GetStores()
+        public async Task<ActionResult> GetStores()
         {
             List<Store> stores = await this.repoStores.GetStoresAsync();
             List<StoreDto> storesDto = this.mapper.Map<List<StoreDto>>(stores);
@@ -35,7 +35,7 @@ namespace ApiEshop.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStore(int id)
+        public async Task<ActionResult> GetStore(int id)
         {
             StoreView store = await this.repoStores.FindStoreAsync(id);
             if (store == null)
@@ -55,7 +55,7 @@ namespace ApiEshop.Controllers
 
         [HttpGet]
         [Route("SimpleStore/{id}")]
-        public async Task<IActionResult> GetSimpleStore(int id)
+        public async Task<ActionResult> GetSimpleStore(int id)
         {
             Store store = await this.repoStores.FindSimpleStoreAsync(id);
             if (store == null)
@@ -71,7 +71,7 @@ namespace ApiEshop.Controllers
         //Store create, stripe etc handled on mvc so I send a model instead a dto
         [HttpPost]
         [Route("Create")]
-        public async Task<IActionResult> CreateStore(Store store)
+        public async Task<ActionResult> CreateStore(Store store)
         {
             Store s = await this.repoStores.CreateStoreAsync(store.Name, store.Email, store.Image, store.Category, store.UserId, store.StripeId);
             return Ok(s);
@@ -80,7 +80,7 @@ namespace ApiEshop.Controllers
 
         [HttpGet]
         [Route("OnboardingComplete/{id}")]
-        public async Task<IActionResult> OnboardingComplete(int id)
+        public async Task<ActionResult> OnboardingComplete(int id)
         {
             var store = await this.repoStores.FindSimpleStoreAsync(id);
             if (store == null)
@@ -100,7 +100,7 @@ namespace ApiEshop.Controllers
 
         [HttpGet]
         [Route("Stores/RefreshOnboarding/{id}")]
-        public async Task<IActionResult> RefreshOnboarding(int id)
+        public async Task<ActionResult> RefreshOnboarding(int id)
         {
             Store store = await this.repoStores.FindSimpleStoreAsync(id);
             if (store == null)
@@ -129,7 +129,7 @@ namespace ApiEshop.Controllers
 
         [HttpPut]
         [Route("Update/{id}")]
-        public async Task<IActionResult> UpdateStore(int id, StoreDto s)
+        public async Task<ActionResult> UpdateStore(int id, StoreDto s)
         {
 
             var result = await this.repoStores.UpdateStoreAsync(id, s.Name, s.Email, s.Image, s.Category);
@@ -146,7 +146,7 @@ namespace ApiEshop.Controllers
 
         [HttpDelete]
         [Route("delete/{id}")]
-        public async Task<IActionResult> DeleteStore(int id)
+        public async Task<ActionResult> DeleteStore(int id)
         {
             await this.repoStores.DeleteStoreAsync(id);
 

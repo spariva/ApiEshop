@@ -29,7 +29,7 @@ namespace ApiEshop.Controllers
         //Podría hacer que el dto use el dto user etc y empezar a ocultar info
         [HttpGet]
         [Route("[action]/{id}")]
-        public async Task<IActionResult> Profile(int id,
+        public async Task<ActionResult> Profile(int id,
             [FromQuery]bool includeStore=true,
             [FromQuery] bool includePurchases = true)
         {
@@ -59,9 +59,22 @@ namespace ApiEshop.Controllers
             return Ok(profileDto);
         }
 
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<ActionResult> FindStoreByUser(int id)
+        {
+            Store store = await this.repoUsers.FindStoreByUserIdAsync(id);
+            if(store == null)
+            {
+                return NotFound("Store not found =(");
+            }
+            StoreDto storeDto = this.mapper.Map<StoreDto>(store);
+            return Ok(storeDto);
+        }
         //[HttpGet]
         //[Route("[action]/{id}")]
-        //public async Task<IActionResult> PurchaseDetails(int id)
+        //public async Task<ActionResult> PurchaseDetails(int id)
         //{
         //    Purchase purchase = await this.repoPay.GetPurchaseByIdAsync(id);
         //    if (purchase == null)

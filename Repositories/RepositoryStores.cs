@@ -115,8 +115,8 @@ namespace ApiEshop.Repositories
 
         public async Task<Category> FindOrCreateCategoryAsync(string categoryName) {
             var category = await this.context.Categories.FirstOrDefaultAsync(c => c.CategoryName == categoryName.ToUpper());
-            int maxId = await this.context.Categories.MaxAsync(x => x.Id);
             if (category == null) {
+                int maxId = await this.context.Categories.MaxAsync(x => x.Id);
                 category = new Category { Id = (maxId + 1), CategoryName = categoryName };
                 this.context.Categories.Add(category);
                 await this.context.SaveChangesAsync();
@@ -144,25 +144,21 @@ namespace ApiEshop.Repositories
         public async Task<List<Product>> GetAllProductsAsync() {
             var consulta = await this.context.Products.ToListAsync();
             // Get the products for the store, including their ProdCats and Categories
-            //List<Product> products = await this.context.Products
-            //    .Include(p => p.ProdCats) // Include ProdCats
-            //    .ThenInclude(pc => pc.Category) // Include Category for each ProdCat
-            //    .ToListAsync();
+            List<Product> products = await this.context.Products
+                .Include(p => p.ProdCats) // Include ProdCats
+                .ThenInclude(pc => pc.Category) // Include Category for each ProdCat
+                .ToListAsync();
 
-            //// Get distinct category names for the filter list
-            //var categoryNames = products
-            //    .SelectMany(p => p.ProdCats.Select(pc => pc.Category.CategoryName))
-            //    .Distinct()
-            //    .ToList();
+            // Get distinct category names for the filter list
+            var categoryNames = products
+                .SelectMany(p => p.ProdCats.Select(pc => pc.Category.CategoryName))
+                .Distinct()
+                .ToList();
 
-            return consulta;
+            return products;
         }
 
         public async Task<Product> FindProductAsync(int idProduct) {
-            //var consulta = from datos in this.context.Products
-            //               where datos.Id == idProduct
-            //               select datos;
-
             var product = this.context.Products
                 .Where(p => p.Id == idProduct) // Filter by product ID
                 .Include(p => p.ProdCats) // Include ProdCats
