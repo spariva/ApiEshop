@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Stripe;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiEshop.Controllers
 {
@@ -26,6 +27,7 @@ namespace ApiEshop.Controllers
         }
 
         #region Stores CRUD
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult> GetStores()
         {

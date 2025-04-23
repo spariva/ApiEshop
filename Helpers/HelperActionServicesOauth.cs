@@ -18,7 +18,7 @@ namespace ApiEshop.Helpers
         {
             //this.secretCli = secretCli;
             this.Issuer = configuration.GetValue<string>("ApiOAuth:Issuer");
-            //GetSecretFromKeyVaultAsync("Issuer").GetAwaiter().GetResult();
+            //GetSecretFromKeyVaultAsync("Issuer").GetAwaiter().GetResult(); e IssuerLocal
             this.Audience = configuration.GetValue<string>("ApiOAuth:Audience");
             //GetSecretFromKeyVaultAsync("Audience").GetAwaiter().GetResult();
             this.SecretKey = configuration.GetValue<string>("ApiOAuth:SecretKey");
