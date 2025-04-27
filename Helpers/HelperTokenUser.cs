@@ -19,7 +19,6 @@ namespace ApiEshop.Helpers
         public User GetUser()
         {
             Claim claim = contextAccessor.HttpContext.User.FindFirst(x => x.Type == "UserData");
-
             if(claim == null)
             {
                 throw new UnauthorizedAccessException("'UserData' claim not found.");
@@ -27,8 +26,8 @@ namespace ApiEshop.Helpers
 
             string json = claim.Value;
             string jsonUsuario = HelperCryptography.DecryptString(json);
-            User u = JsonConvert.DeserializeObject<User>(jsonUsuario);
-            return u;
+            User user = JsonConvert.DeserializeObject<User>(json);
+            return user;
         }
     }
 

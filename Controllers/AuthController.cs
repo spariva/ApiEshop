@@ -16,10 +16,9 @@ namespace ApiEshop.Controllers
     public class AuthController: ControllerBase
     {
         private RepositoryUsers repo;
-        private HelperActionServicesOAuth helper;
+        private HelperOAuth helper;
 
-        public AuthController(RepositoryUsers repo
-            , HelperActionServicesOAuth helper)
+        public AuthController(RepositoryUsers repo, HelperOAuth helper)
         {
             this.repo = repo;
             this.helper = helper;
@@ -30,21 +29,17 @@ namespace ApiEshop.Controllers
         public async Task<ActionResult> Login(LoginDto model)
         {
             User u = await this.repo.LoginAsync(model.Email, model.Password);
-
             if(u == null)
             {
                 return Unauthorized();
             }
 
             //here a possible dto to avoid sending all the user data in the token... if you dont want that
-
-            //to save or not to save personal data in the token...
-            string jsonUsuario = JsonConvert.SerializeObject(u);
-            string jsonCifrado = HelperCryptography.EncryptString(jsonUsuario);
-
+            string json = JsonConvert.SerializeObject(u);
+            //string jsonCifrado = HelperCryptography.EncryptString(json);
             Claim[] informacion = new[]
             {
-                new Claim("UserData", jsonCifrado)
+                new Claim("UserData", json)
             };
 
             SigningCredentials credentials = new SigningCredentials(this.helper.GetKeyToken(), SecurityAlgorithms.HmacSha256);

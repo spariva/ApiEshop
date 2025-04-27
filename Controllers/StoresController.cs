@@ -27,7 +27,7 @@ namespace ApiEshop.Controllers
         }
 
         #region Stores CRUD
-        [Authorize]
+        
         [HttpGet]
         public async Task<ActionResult> GetStores()
         {
@@ -36,6 +36,7 @@ namespace ApiEshop.Controllers
             return Ok(storesDto);
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetStore(int id)
         {
@@ -71,6 +72,7 @@ namespace ApiEshop.Controllers
         }
 
         //Store create, stripe etc handled on mvc so I send a model instead a dto
+        [Authorize]
         [HttpPost]
         [Route("Create")]
         public async Task<ActionResult> CreateStore(Store store)

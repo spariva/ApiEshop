@@ -40,18 +40,18 @@ namespace ApiEshop.Helpers
             byte[] iv = new byte[16];
             byte[] array;
 
-            using(Aes aes = Aes.Create())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
                 aes.IV = iv;
 
                 ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                using(MemoryStream memoryStream = new MemoryStream())
+                using (MemoryStream memoryStream = new MemoryStream())
                 {
-                    using(CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, encryptor, CryptoStreamMode.Write))
                     {
-                        using(StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
+                        using (StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
                         {
                             streamWriter.Write(plainText);
                         }
@@ -82,7 +82,7 @@ namespace ApiEshop.Helpers
                     Encoding.UTF8.GetBytes(textocompleto);
                 //Convert.FromBase64String(textocompleto);
                 //ENCRIPTAMOS EL TEXTO 1000 VECES
-                for(int i = 0; i < numhash; i++)
+                for (int i = 0; i < numhash; i++)
                     bytesalida = objsha.ComputeHash(bytesalida);
             }
             finally
@@ -98,17 +98,17 @@ namespace ApiEshop.Helpers
             byte[] iv = new byte[16];
             byte[] buffer = Convert.FromBase64String(cipherText);
 
-            using(Aes aes = Aes.Create())
+            using (Aes aes = Aes.Create())
             {
                 aes.Key = key;
                 aes.IV = iv;
                 ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
 
-                using(MemoryStream memoryStream = new MemoryStream(buffer))
+                using (MemoryStream memoryStream = new MemoryStream(buffer))
                 {
-                    using(CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)memoryStream, decryptor, CryptoStreamMode.Read))
                     {
-                        using(StreamReader streamReader = new StreamReader((Stream)cryptoStream))
+                        using (StreamReader streamReader = new StreamReader((Stream)cryptoStream))
                         {
                             return streamReader.ReadToEnd();
                         }

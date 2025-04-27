@@ -6,23 +6,20 @@ using Azure.Security.KeyVault.Secrets;
 
 namespace ApiEshop.Helpers
 {
-    public class HelperActionServicesOAuth
+    public class HelperOAuth
     {
         private SecretClient secretCli;
         public string Issuer { get; set; }
         public string Audience { get; set; }
         public string SecretKey { get; set; }
 
-        public HelperActionServicesOAuth
-            (IConfiguration configuration)
+        public HelperOAuth
+            (IConfiguration configuration, SecretClient secretCli)
         {
-            //this.secretCli = secretCli;
-            this.Issuer = configuration.GetValue<string>("ApiOAuth:Issuer");
-            //GetSecretFromKeyVaultAsync("Issuer").GetAwaiter().GetResult(); e IssuerLocal
-            this.Audience = configuration.GetValue<string>("ApiOAuth:Audience");
-            //GetSecretFromKeyVaultAsync("Audience").GetAwaiter().GetResult();
-            this.SecretKey = configuration.GetValue<string>("ApiOAuth:SecretKey");
-            //GetSecretFromKeyVaultAsync("SecretKey").GetAwaiter().GetResult();
+            this.secretCli = secretCli;
+            this.Issuer = GetSecretFromKeyVaultAsync("IssuerLocal").GetAwaiter().GetResult(); //constructor cant process normal await
+            this.Audience = GetSecretFromKeyVaultAsync("Audience").GetAwaiter().GetResult();
+            this.SecretKey = GetSecretFromKeyVaultAsync("SecretKey").GetAwaiter().GetResult();
         }
 
         private async Task<string> GetSecretFromKeyVaultAsync(string secretName)
@@ -36,7 +33,6 @@ namespace ApiEshop.Helpers
         {
             //convertimos el secret key a bytes[]
             byte[] data = Encoding.UTF8.GetBytes(this.SecretKey);
-
             //devolvemos la key 
             return new SymmetricSecurityKey(data);
         }
@@ -49,8 +45,7 @@ namespace ApiEshop.Helpers
                 {
                     //indicamos que debemos validar de nuestro
                     //token: issuer, audience, time...
-                    options.TokenValidationParameters =
-                    new TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
@@ -65,9 +60,7 @@ namespace ApiEshop.Helpers
         }
 
 
-        //metodo para indicar el esquema de la validacion
-        public Action<AuthenticationOptions>
-            GetAuthenticationSchema()
+        public Action<AuthenticationOptions> GetAuthenticationSchema()
         {
             Action<AuthenticationOptions> options =
                 new Action<AuthenticationOptions>(options =>

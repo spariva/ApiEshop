@@ -1,6 +1,7 @@
 ﻿using ApiEshop.Data;
 using ApiEshop.Models;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ApiEshop.Repositories
 {
@@ -51,24 +52,7 @@ namespace ApiEshop.Repositories
         }
 
         public async Task<User> LoginAsync(string email, string password) {
-            var consulta = from datos in this.context.Users
-                           where datos.Email == email
-                           select datos;
-
-            User user = await consulta.FirstOrDefaultAsync();
-
-            if (user == null) {
-                return null;
-            }
-
-            //Estoy comparando el password con el salt, hasta que meta criptografia este finde
-            if (user.Salt != password) {
-                return null;
-            }
-            //if (!PasswordHelper.VerifyPassword(password, user.PasswordHash, user.Salt)) {
-            //    return null;
-            //}
-            return user;
+            return await this.context.Users.Where(x => x.Email == email && x.Salt == password).FirstOrDefaultAsync();
         }
 
         public async Task<User> InsertUserAsync(string name, string email, string password, string telephone, string address) {
