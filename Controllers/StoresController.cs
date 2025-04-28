@@ -36,7 +36,6 @@ namespace ApiEshop.Controllers
             return Ok(storesDto);
         }
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetStore(int id)
         {
@@ -131,6 +130,7 @@ namespace ApiEshop.Controllers
             return Redirect(accountLink.Url);
         }
 
+        [Authorize]
         [HttpPut]
         [Route("Update/{id}")]
         public async Task<ActionResult> UpdateStore(int id, StoreDto s)
@@ -148,6 +148,7 @@ namespace ApiEshop.Controllers
             return Ok(store);
         }
 
+        [Authorize]
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult> DeleteStore(int id)

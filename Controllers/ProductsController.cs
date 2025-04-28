@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Stripe;
 using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ApiEshop.Controllers
@@ -68,6 +69,7 @@ namespace ApiEshop.Controllers
             return Ok(p);
         }
 
+        [Authorize]
         [HttpPost]
         [Route("[action]/{id}")]
         public async Task<ActionResult> Create(ProductDto p)
@@ -78,6 +80,7 @@ namespace ApiEshop.Controllers
             return Ok(pDto);
         }
 
+        [Authorize]
         [HttpPut]
         [Route("[action]/{id}")]
         public async Task<ActionResult> Update(int id, ProductDto p)
@@ -88,6 +91,7 @@ namespace ApiEshop.Controllers
             return Ok(pDto);
         }
 
+        [Authorize]
         [HttpDelete]
         [Route("[action]/{id}")]
         public async Task<ActionResult> Delete(int id)

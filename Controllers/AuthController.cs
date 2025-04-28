@@ -49,11 +49,26 @@ namespace ApiEshop.Controllers
                 issuer: this.helper.Issuer,
                 audience: this.helper.Audience,
                 signingCredentials: credentials,
-                expires: DateTime.UtcNow.AddMinutes(20),
+                expires: DateTime.UtcNow.AddMinutes(30),
                 notBefore: DateTime.UtcNow
             );
 
             return Ok(new { response = new JwtSecurityTokenHandler().WriteToken(token) });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Register(RegisterDto model)
+        {
+            try
+            {
+                await this.repo.InsertUserAsync(model.Name, model.Email, model.Password, model.Telephone, model.Address);
+                return Ok(new { success = true, message = "New user created." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
         }
     }
 }

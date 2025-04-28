@@ -5,6 +5,7 @@ using ApiEshop.Models.DTOs;
 using Product = ApiEshop.Models.Product;
 using ApiEshop.Repositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiEshop.Controllers
 {
@@ -27,10 +28,11 @@ namespace ApiEshop.Controllers
         }
 
         //Podría hacer que el dto use el dto user etc y empezar a ocultar info
+        [Authorize]
         [HttpGet]
         [Route("[action]/{id}")]
         public async Task<ActionResult> Profile(int id,
-            [FromQuery]bool includeStore=true,
+            [FromQuery] bool includeStore = true,
             [FromQuery] bool includePurchases = true)
         {
             User user = await this.repoUsers.FindUserAsync(id);
@@ -44,7 +46,7 @@ namespace ApiEshop.Controllers
             if (includeStore)
             {
                 profileDto.Store = await this.repoUsers.FindStoreByUserIdAsync(id);
-             
+
             }
 
             if (includePurchases)
@@ -65,58 +67,33 @@ namespace ApiEshop.Controllers
         public async Task<ActionResult> FindStoreByUser(int id)
         {
             Store store = await this.repoUsers.FindStoreByUserIdAsync(id);
-            if(store == null)
+            if (store == null)
             {
                 return NotFound("Store not found =(");
             }
             StoreDto storeDto = this.mapper.Map<StoreDto>(store);
             return Ok(storeDto);
         }
-        //[HttpGet]
-        //[Route("[action]/{id}")]
-        //public async Task<ActionResult> PurchaseDetails(int id)
-        //{
-        //    Purchase purchase = await this.repoPay.GetPurchaseByIdAsync(id);
-        //    if (purchase == null)
-        //    {
-        //        return NotFound("Purchase not found =(");
-        //    }
 
-        //    foreach (PurchaseItem item in purchase.PurchaseItems)
-        //    {
-        //        item.Product = await this.repoStores.FindProductAsync(item.ProductId);
-        //    }
+        [Authorize]
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<ActionResult> PurchaseDetails(int id)
+        {
+            Purchase purchase = await this.repoPay.GetPurchaseByIdAsync(id);
+            if (purchase == null)
+            {
+                return NotFound("Purchase not found =(");
+            }
 
-        //    PurchaseDto purchaseDto = new PurchaseDto
-        //    {
-        //        Id = purchase.Id,
-        //        UserId = purchase.UserId,
-        //        TotalPrice = purchase.TotalPrice,
-        //        PaymentStatus = purchase.PaymentStatus,
-        //        CreatedAt = purchase.CreatedAt,
-        //        Items = purchase.PurchaseItems.Select(item => new PurchaseItemDto
-        //        {
-        //            Id = item.Id,
-        //            ProductId = item.ProductId,
-        //            Quantity = item.Quantity,
-        //            Price = item.PriceAtPurchase,
-        //            Product = new ProductDto
-        //            {
-        //                Id = item.Product.Id,
-        //                Name = item.Product.Name,
-        //                Description = item.Product.Description,
-        //                Price = item.Product.Price,
-        //                StockQuantity = item.Product.StockQuantity,
-        //                ImageUrl = item.Product.ImageUrl
-        //            }
-        //        }).ToList()
+            foreach (PurchaseItem item in purchase.PurchaseItems)
+            {
+                item.Product = await this.repoStores.FindProductAsync(item.ProductId);
+            }
 
-        //    };
-        //    // AAAA haz el automapper ya, y estos dtos están mal, pone en purchaseitemdto solo el name de product
-        //    return Ok(purchase);
-        //}
-
-
+            PurchaseDto p = this.mapper.Map<PurchaseDto>(purchase);
+            return Ok(p);
+        }
 
 
     }
